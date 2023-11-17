@@ -9,9 +9,9 @@ class Game:
     def __init__(self):
         self.next_player = 'white'
         self.hovered_sqr = None
-        self.board = Board()
-        self.dragger = Dragger()
         self.config = Config()
+        self.board = Board(self.config)
+        self.dragger = Dragger()
         self.interface_white = Interface("player 1", "white")
         self.interface_black = Interface("player 2", "black")
 
@@ -112,8 +112,12 @@ class Game:
     def change_theme(self):
         self.config.change_theme()
 
-    def play_sound(self, captured=False):
-        if captured:
+    def play_sound(self, captured=False, checked=False):
+        print(f"play_sound // captured 여부 : {captured}") #@!
+        if checked:
+            self.config.check_sound.play()
+            self.config.check_voice.play()
+        elif captured:
             self.config.capture_sound.play()
         else:
             self.config.move_sound.play()

@@ -59,8 +59,8 @@ class Config:
             os.path.join('assets', 'sounds', 'move_check.mp3'))
         self.castling_sound = Sound(
             os.path.join('assets', 'sounds', 'castling.mp3'))
-        self.promote_sound = Sound(
-            os.path.join('assets', 'sounds', 'promote.mp3'))
+        self.promotion_sound = Sound(
+            os.path.join('assets', 'sounds', 'promotion.mp3'))
         
         # voices
         self.check_voice = Sound(
@@ -71,6 +71,10 @@ class Config:
             os.path.join('assets', 'sounds', 'stalemate_voice.mp3'))
         self.castling_voice = Sound(
             os.path.join('assets', 'sounds', 'castling_voice.mp3'))
+        self.enpassant_voice = Sound(
+            os.path.join('assets', 'sounds', 'en_passant_voice.mp3'))
+        self.promotion_voice = Sound(
+            os.path.join('assets', 'sounds', 'promotion_voice.mp3'))
 
     def change_theme(self):
         self.idx += 1

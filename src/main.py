@@ -27,6 +27,7 @@ class Main:
             for event in pygame.event.get():
                 # print(event)
                 if event.type == pygame.MOUSEBUTTONDOWN: # click
+                    print() #@!
                     self.game.dragger.update_mouse(event.pos) # position
                     
                     # bounded pos
@@ -40,7 +41,7 @@ class Main:
                         piece = self.game.board.squares[clicked_row][clicked_col].piece
                         # valid piece (color) ?
                         if piece.color == self.game.next_player:
-                            self.game.board.calc_moves(piece, clicked_row, clicked_col, testing=True)
+                            self.game.board.calc_moves(piece, clicked_row, clicked_col, testing=False)
                             self.game.dragger.save_initial(event.pos)
                             self.game.dragger.drag_piece(piece)
                             
@@ -72,6 +73,7 @@ class Main:
                         self.game.dragger.update_blit(self.screen)
                 
                 elif event.type == pygame.MOUSEBUTTONUP: # click release
+                    print() #@!
                     if self.game.dragger.dragging:
                         self.game.dragger.update_mouse(event.pos)
 
@@ -87,14 +89,16 @@ class Main:
 
                         # valid move ?
                         if self.game.board.valid_move(self.game.dragger.piece, move):
-                            # normal capture
+                            # print(f"움직인 곳에 무엇이 있을까? : {self.game.board.squares[released_row][released_col].piece.__class__.__name__}, {self.game.board.squares[released_row][released_col].piece.color}") #@!
                             captured = self.game.board.squares[released_row][released_col].has_piece()
+                            checked = self.game.board.in_check_on(self.game.dragger.piece, move)
+
+                            # normal capture
                             self.game.board.move(self.game.dragger.piece, move)
-
                             self.game.board.set_true_en_passant(self.game.dragger.piece)                            
-
+                            
                             # sounds
-                            self.game.play_sound(captured)
+                            self.game.play_sound(captured, checked)
 
                             # show
                             self.game.show_bg(self.screen)
