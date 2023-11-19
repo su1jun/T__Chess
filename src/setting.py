@@ -14,6 +14,15 @@ SQSIZE = WIDTH // COLS
 WIDTH_IN = 720
 HEIGHT_IN = 0
 
+ALPHACOLS = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h'}
+
+def get_alphacol(col):
+    ALPHACOLS = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h'}
+    return ALPHACOLS[col]
+
+ATTACK_DARK = "#C84646"
+ATTACK_LIGHT = "#C86464"
+
 class Sound:
     def __init__(self, path):
         self.path = path
@@ -42,6 +51,7 @@ class Config:
         self._add_themes()
         self.idx = 0
         self.theme = self.themes[self.idx]
+        self.voice_sex = 'female_voice'
         self.font = pygame.font.SysFont('monospace', 18, bold=True)
 
         # images
@@ -52,29 +62,35 @@ class Config:
         
         # sounds
         self.move_sound = Sound(
-            os.path.join('assets', 'sounds', 'move_self.mp3'))
+            os.path.join('assets', 'sounds', 'effects', 'move_self.mp3'))
         self.capture_sound = Sound(
-            os.path.join('assets', 'sounds', 'capture.mp3'))
+            os.path.join('assets', 'sounds', 'effects', 'capture.mp3'))
         self.check_sound = Sound(
-            os.path.join('assets', 'sounds', 'move_check.mp3'))
+            os.path.join('assets', 'sounds', 'effects', 'move_check.mp3'))
         self.castling_sound = Sound(
-            os.path.join('assets', 'sounds', 'castling.mp3'))
+            os.path.join('assets', 'sounds', 'effects', 'castling.mp3'))
         self.promotion_sound = Sound(
-            os.path.join('assets', 'sounds', 'promotion.mp3'))
+            os.path.join('assets', 'sounds', 'effects', 'promotion.mp3'))
         
         # voices
         self.check_voice = Sound(
-            os.path.join('assets', 'sounds', 'check_voice.mp3'))
+            os.path.join('assets', 'sounds', self.voice_sex, 'check_voice.mp3'))
         self.checkmate_voice = Sound(
-            os.path.join('assets', 'sounds', 'checkmate_voice.mp3'))
+            os.path.join('assets', 'sounds', self.voice_sex, 'checkmate_voice.mp3'))
         self.stalemate_voice = Sound(
-            os.path.join('assets', 'sounds', 'stalemate_voice.mp3'))
-        self.castling_voice = Sound(
-            os.path.join('assets', 'sounds', 'castling_voice.mp3'))
-        self.enpassant_voice = Sound(
-            os.path.join('assets', 'sounds', 'en_passant_voice.mp3'))
+            os.path.join('assets', 'sounds', self.voice_sex, 'stalemate_voice.mp3'))
+        self.draw_voice = Sound(
+            os.path.join('assets', 'sounds', self.voice_sex, 'draw_voice.mp3'))
+        
+        self.queen_castling_voice = Sound(
+            os.path.join('assets', 'sounds', self.voice_sex, 'queen_castling_voice.mp3'))
+        self.king_castling_voice = Sound(
+            os.path.join('assets', 'sounds', self.voice_sex, 'king_castling_voice.mp3'))
+        
+        self.en_passant_voice = Sound(
+            os.path.join('assets', 'sounds', self.voice_sex, 'en_passant_voice.mp3'))
         self.promotion_voice = Sound(
-            os.path.join('assets', 'sounds', 'promotion_voice.mp3'))
+            os.path.join('assets', 'sounds', self.voice_sex, 'promotion_voice.mp3'))
 
     def change_theme(self):
         self.idx += 1

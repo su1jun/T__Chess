@@ -12,6 +12,12 @@ class Piece:
         self.set_texture()
         self.texture_rect = texture_rect
 
+    def __str__(self):
+        s = ''
+        s += f'{self.__class__.__name__}, '
+        s += f'{self.color}'
+        return s
+
     def set_texture(self, size=80):
         self.texture = os.path.join(
             'assets', 'images', f'imgs-{size}px/{self.color}_{self.name}.png')
@@ -34,6 +40,14 @@ class Pawn(Piece):
         self.en_passant = False
         super().__init__('pawn', color, 1.0)
 
+    def __str__(self):
+        s = super().__str__()
+        if self.en_passant:
+            s += "_T"
+        else:
+            s += "_F"
+        return s
+
 class Knight(Piece):
     def __init__(self, color):
         super().__init__('knight', color, 3.0)
@@ -52,6 +66,4 @@ class Queen(Piece):
 
 class King(Piece):
     def __init__(self, color):
-        self.left_rook = None
-        self.right_rook = None
         super().__init__('king', color, 10000.0)

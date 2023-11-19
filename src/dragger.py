@@ -10,6 +10,16 @@ class Dragger:
         self.initial_row = 0
         self.initial_col = 0
 
+    def __str__(self):
+        s = ''
+        s += f"{self.piece}, {self.dragging}, "
+        final_col = self.mouseX // SQSIZE
+        final_row = self.mouseY // SQSIZE
+        final_row = max(final_row, 0)
+        final_row = min(final_row, 7)
+        s += f"{ALPHACOLS[self.initial_col]}{8 - self.initial_row} -> {ALPHACOLS[final_col]}{8 - final_row}"
+        return s
+
     # blit method
     def update_blit(self, surface):
         # texture

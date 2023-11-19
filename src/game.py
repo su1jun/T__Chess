@@ -3,6 +3,7 @@ from board import Board
 from dragger import Dragger
 from square import Square
 from setting import *
+from piece import *
 from interface import Interface
 
 class Game:
@@ -33,7 +34,7 @@ class Game:
                 # col, label (A, B, ...)
                 if row == 7: 
                     color = self.config.theme.bg.dark if (row + col) % 2 == 0 else self.config.theme.bg.light
-                    lbl = self.config.font.render(Square.get_alphacol(col), 1, color)
+                    lbl = self.config.font.render(get_alphacol(col), 1, color)
                     lbl_pos = (col * SQSIZE + SQSIZE - 20, HEIGHT - 20 + HEIGHT_IN)
                     surface.blit(lbl, lbl_pos)
 
@@ -62,30 +63,43 @@ class Game:
                 img_center = ((move.final.col + 0.5) * SQSIZE, (move.final.row + 0.5) * SQSIZE + HEIGHT_IN)
                 color = self.config.theme.bg.light if (move.final.row + move.final.col) % 2 == 0 else self.config.theme.bg.dark
                 if move.final.has_enemy_piece(self.next_player):
-                    img = pygame.image.load(self.config.attack_point)
-                    img_rect = img.get_rect(center=img_center)
+                    if move.final.is_en_passant() and (move.final.row == 2 or move.final.row == 5):
+                        temp = 1 if self.next_player == 'white' else -1 # white == 1, black == -1
+                        color = self.config.theme.bg.light if (move.final.row + temp + move.final.col) % 2 == 0 else self.config.theme.bg.dark
+
+                        img_center = ((move.final.col + 0.5) * SQSIZE, (move.final.row + temp + 0.5) * SQSIZE + HEIGHT_IN)
+                        img = pygame.image.load(self.config.attack_point)
+                        img_rect = img.get_rect(center=img_center)
+
+                        surface.fill(color, img_rect)
+                        self.show_last_move(surface, move.final)
+                        surface.blit(img, img_rect)
+
+                        img_center = ((move.final.col + 0.5) * SQSIZE, (move.final.row + 0.5) * SQSIZE + HEIGHT_IN)
+                        color = self.config.theme.bg.light if (move.final.row + move.final.col) % 2 == 0 else self.config.theme.bg.dark
+                        img = pygame.image.load(self.config.move_point)
+                        img_rect = img.get_rect(center=img_center)
+                    else:
+                        img = pygame.image.load(self.config.attack_point)
+                        img_rect = img.get_rect(center=img_center)
                 else:
                     img = pygame.image.load(self.config.move_point)
                     img_rect = img.get_rect(center=img_center)
-                surface.fill(color, img_rect)
-                self.show_last_move(surface, move.final)
+                #$%
+                # surface.fill(color, img_rect)
+                # self.show_last_move(surface, move.final)
                 surface.blit(img, img_rect)
-                
-                # color = (226, 226, 226, 245)
-                # circle = ((move.final.col + 0.5) * SQSIZE, (move.final.row + 0.5) * SQSIZE + HEIGHT_IN)
-                # pygame.draw.circle(surface, color, circle, SQSIZE//4)
 
     def show_last_move(self, surface, move=None):
         if self.board.last_move:
             initial = self.board.last_move.initial
             final = self.board.last_move.final
-
             if move:
                 if move == initial:
                     color = self.config.theme.trace.light if (initial.row + initial.col) % 2 == 0 else self.config.theme.trace.dark
                     rect = (initial.col * SQSIZE, initial.row * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
                     pygame.draw.rect(surface, color, rect)
-                elif move == final:
+                elif move == final or move.is_en_passant():
                     color = self.config.theme.trace.light if (final.row + final.col) % 2 == 0 else self.config.theme.trace.dark
                     rect = (final.col * SQSIZE, final.row * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
                     pygame.draw.rect(surface, color, rect)
@@ -94,6 +108,13 @@ class Game:
                     color = self.config.theme.trace.light if (pos.row + pos.col) % 2 == 0 else self.config.theme.trace.dark
                     rect = (pos.col * SQSIZE, pos.row * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
                     pygame.draw.rect(surface, color, rect)
+
+    def show_check(self, surface):
+        if self.board.check_locs:
+            for pos in self.board.check_locs:
+                color = ATTACK_LIGHT if (pos.row + pos.col) % 2 == 0 else ATTACK_DARK
+                rect = (pos.col * SQSIZE, pos.row * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
+                pygame.draw.rect(surface, color, rect)
 
     def show_hover(self, surface):
         if self.hovered_sqr:
@@ -112,15 +133,20 @@ class Game:
     def change_theme(self):
         self.config.change_theme()
 
-    def play_sound(self, captured=False, checked=False):
-        print(f"play_sound // captured 여부 : {captured}") #@!
-        if checked:
+    def play_sound(self, captured, checked, stalemated, checkmated):
+        if checkmated:
+            self.config.check_sound.play()
+            self.config.checkmate_voice.play()
+        elif checked:
             self.config.check_sound.play()
             self.config.check_voice.play()
         elif captured:
             self.config.capture_sound.play()
         else:
             self.config.move_sound.play()
+
+        if stalemated:
+            self.config.stalemate_voice.play()
 
     def reset(self):
         self.__init__()

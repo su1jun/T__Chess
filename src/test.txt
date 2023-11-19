@@ -1,0 +1,33 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Since the actual data points are not provided, we'll have to estimate them from the image.
+# These are rough estimations and may not be accurate.
+
+# Estimated data from the graph
+freq = np.array([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20])  # Frequency in GHz
+transmission_calculated = np.array([1, 1, 0.97, 0.94, 0.9, 0.85, 0.65, 0.6, 0.6, 0.62, 0.63])
+transmission_calculated_shifted = np.array([1, 1, 0.98, 0.95, 0.91, 0.88, 0.9, 0.88, 0.85, 0.83, 0.82])
+transmission_experimental = np.array([0.98, 0.98, 0.95, 0.92, 0.88, 0.8, 0.5, 0.55, 0.6, 0.65, 0.7])
+transmission_experimental_calibrated = np.array([0.97, 0.97, 0.94, 0.91, 0.87, 0.78, 0.55, 0.6, 0.65, 0.7, 0.75])
+
+# Plotting the data
+plt.figure(figsize=(8, 6))
+plt.plot(freq, transmission_calculated, 's-', label='Calculated (shifted)')
+plt.plot(freq, transmission_experimental, 'x--', label='Experimental')
+plt.plot(freq, transmission_calculated_shifted, 's-', label='Calculated')
+plt.plot(freq, transmission_experimental_calibrated, 'x--', label='Experimental (calibrated)')
+
+# Annotations
+plt.text(10, 0.75, 'l = 1cm\na = 0.01cm\nh = 0.01cm', fontsize=12)
+
+# Adding title and labels
+plt.title('Transmission coefficient (magnitude)')
+plt.xlabel('f(GHz)')
+plt.ylabel('Transmission coefficient\n(magnitude)')
+
+# Adding legend
+plt.legend()
+
+# Show the plot
+plt.show()

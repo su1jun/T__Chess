@@ -16,6 +16,7 @@ class Main:
             # show
             self.game.show_bg(self.screen)
             self.game.show_last_move(self.screen)
+            self.game.show_check(self.screen)
             self.game.show_moves(self.screen)
             self.game.show_pieces(self.screen)
             self.game.show_hover(self.screen)
@@ -27,7 +28,7 @@ class Main:
             for event in pygame.event.get():
                 # print(event)
                 if event.type == pygame.MOUSEBUTTONDOWN: # click
-                    print() #@!
+                    print("\nclick!") #@!
                     self.game.dragger.update_mouse(event.pos) # position
                     
                     # bounded pos
@@ -35,7 +36,7 @@ class Main:
                     clicked_row = max(clicked_row, 0)
                     clicked_row = min(clicked_row, 7)
                     clicked_col = self.game.dragger.mouseX // SQSIZE
-
+                    print(f"{self.game.board.squares[clicked_row][clicked_col]}") #@!
                     # if clicked square has a piece ?
                     if self.game.board.squares[clicked_row][clicked_col].has_piece():
                         piece = self.game.board.squares[clicked_row][clicked_col].piece
@@ -48,6 +49,7 @@ class Main:
                     # show
                     self.game.show_bg(self.screen)
                     self.game.show_last_move(self.screen)
+                    self.game.show_check(self.screen)
                     self.game.show_moves(self.screen)
                     self.game.show_pieces(self.screen)
                     self.game.show_hover(self.screen)
@@ -66,6 +68,7 @@ class Main:
                         # show
                         self.game.show_bg(self.screen)
                         self.game.show_last_move(self.screen)
+                        self.game.show_check(self.screen)
                         self.game.show_moves(self.screen)
                         self.game.show_pieces(self.screen)
                         self.game.show_hover(self.screen)
@@ -73,7 +76,8 @@ class Main:
                         self.game.dragger.update_blit(self.screen)
                 
                 elif event.type == pygame.MOUSEBUTTONUP: # click release
-                    print() #@!
+                    print("\nrelease") #@!
+                    print(f"{self.game.dragger}") #@!
                     if self.game.dragger.dragging:
                         self.game.dragger.update_mouse(event.pos)
 
@@ -81,28 +85,28 @@ class Main:
                         released_row = max(released_row, 0)
                         released_row = min(released_row, 7)
                         released_col = self.game.dragger.mouseX // SQSIZE
-
+                        print(f"{self.game.board.squares[released_row][released_col]}") #@!
                         # create possible move
                         initial = Square(self.game.dragger.initial_row, self.game.dragger.initial_col)
                         final = Square(released_row, released_col)
-                        move = Move(initial, final)
-
+                        chk_move = Move(initial, final)
+                        move = self.game.board.valid_move(self.game.dragger.piece, chk_move)
                         # valid move ?
-                        if self.game.board.valid_move(self.game.dragger.piece, move):
-                            # print(f"움직인 곳에 무엇이 있을까? : {self.game.board.squares[released_row][released_col].piece.__class__.__name__}, {self.game.board.squares[released_row][released_col].piece.color}") #@!
+                        if move:
                             captured = self.game.board.squares[released_row][released_col].has_piece()
-                            checked = self.game.board.in_check_on(self.game.dragger.piece, move)
+                            checked = self.game.board.on_check(self.game.dragger.piece, move)
 
                             # normal capture
                             self.game.board.move(self.game.dragger.piece, move)
-                            self.game.board.set_true_en_passant(self.game.dragger.piece)                            
+                            checkmated, stalemated = self.game.board.on_mate(self.game.dragger.piece)
                             
                             # sounds
-                            self.game.play_sound(captured, checked)
+                            self.game.play_sound(captured, checked, stalemated, checkmated)
 
                             # show
                             self.game.show_bg(self.screen)
                             self.game.show_last_move(self.screen)
+                            self.game.show_check(self.screen)
                             self.game.show_pieces(self.screen)
 
                             # next turn
@@ -112,12 +116,17 @@ class Main:
                 
                 # key press
                 elif event.type == pygame.KEYDOWN:
+
+                    #  back move
+                    if event.key == pygame.K_q:
+                        self.game.board.back_move()
+                        self.game.next_turn()
                     
                     # changing themes
                     if event.key == pygame.K_t:
                         self.game.change_theme()
 
-                     # changing themes
+                     # changing reset
                     if event.key == pygame.K_r:
                         self.game.reset()
 
