@@ -48,7 +48,8 @@ class Game:
                     if piece is not self.dragger.piece:
                         piece.set_texture(size=80)
                         img = pygame.image.load(piece.texture)
-                        img_center = col * SQSIZE + SQSIZE // 2, row * SQSIZE + SQSIZE // 2 + HEIGHT_IN
+                        img_center = abs(col - self.config.show_reverse) * SQSIZE + SQSIZE // 2, abs(row - self.config.show_reverse) * SQSIZE + SQSIZE // 2 + HEIGHT_IN
+                        # print(f"{piece}, 위치 {abs(col - self.config.show_reverse)}, {abs(row - self.config.show_reverse)}")
                         piece.texture_rect = img.get_rect(center=img_center)
                         surface.blit(img, piece.texture_rect)
 
@@ -58,25 +59,26 @@ class Game:
     def show_moves(self, surface): # +attack mark
         if self.dragger.dragging:
             piece = self.dragger.piece
-
             for move in piece.moves:
-                img_center = ((move.final.col + 0.5) * SQSIZE, (move.final.row + 0.5) * SQSIZE + HEIGHT_IN)
-                color = self.config.theme.bg.light if (move.final.row + move.final.col) % 2 == 0 else self.config.theme.bg.dark
-                if move.final.has_enemy_piece(self.next_player):
-                    if move.final.is_en_passant() and (move.final.row == 2 or move.final.row == 5):
-                        temp = 1 if self.next_player == 'white' else -1 # white == 1, black == -1
-                        color = self.config.theme.bg.light if (move.final.row + temp + move.final.col) % 2 == 0 else self.config.theme.bg.dark
+                final = move.final
 
-                        img_center = ((move.final.col + 0.5) * SQSIZE, (move.final.row + temp + 0.5) * SQSIZE + HEIGHT_IN)
+                img_center = ((abs(final.col - self.config.show_reverse) + 0.5) * SQSIZE, (abs(final.row - self.config.show_reverse) + 0.5) * SQSIZE + HEIGHT_IN)
+                color = self.config.theme.bg.light if (final.row + final.col) % 2 == 0 else self.config.theme.bg.dark
+                if final.has_enemy_piece(self.next_player):
+                    if final.is_en_passant() and (final.row == 2 or final.row == 5):
+                        temp = 1 if self.next_player == 'white' else -1 # white == 1, black == -1
+                        color = self.config.theme.bg.light if (final.row + temp + final.col) % 2 == 0 else self.config.theme.bg.dark
+
+                        img_center = ((abs(final.col - self.config.show_reverse) + 0.5) * SQSIZE, (abs(final.row - self.config.show_reverse) + temp + 0.5) * SQSIZE + HEIGHT_IN)
                         img = pygame.image.load(self.config.attack_point)
                         img_rect = img.get_rect(center=img_center)
 
                         surface.fill(color, img_rect)
-                        self.show_last_move(surface, move.final)
+                        self.show_last_move(surface, final)
                         surface.blit(img, img_rect)
 
-                        img_center = ((move.final.col + 0.5) * SQSIZE, (move.final.row + 0.5) * SQSIZE + HEIGHT_IN)
-                        color = self.config.theme.bg.light if (move.final.row + move.final.col) % 2 == 0 else self.config.theme.bg.dark
+                        img_center = (((final.col - self.config.show_reverse) + 0.5) * SQSIZE, ((final.row - self.config.show_reverse) + 0.5) * SQSIZE + HEIGHT_IN)
+                        color = self.config.theme.bg.light if (final.row + final.col) % 2 == 0 else self.config.theme.bg.dark
                         img = pygame.image.load(self.config.move_point)
                         img_rect = img.get_rect(center=img_center)
                     else:
@@ -91,29 +93,30 @@ class Game:
                 surface.blit(img, img_rect)
 
     def show_last_move(self, surface, move=None):
-        if self.board.last_move:
-            initial = self.board.last_move.initial
-            final = self.board.last_move.final
-            if move:
+        # show when rewind
+        if self.board.log_stack:
+            initial = self.board.log_stack[-1][1].initial
+            final = self.board.log_stack[-1][1].final
+            if move: # show when the last move location overlay
                 if move == initial:
                     color = self.config.theme.trace.light if (initial.row + initial.col) % 2 == 0 else self.config.theme.trace.dark
-                    rect = (initial.col * SQSIZE, initial.row * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
+                    rect = (abs(initial.col - self.config.show_reverse) * SQSIZE, abs(initial.row - self.config.show_reverse) * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
                     pygame.draw.rect(surface, color, rect)
                 elif move == final or move.is_en_passant():
                     color = self.config.theme.trace.light if (final.row + final.col) % 2 == 0 else self.config.theme.trace.dark
-                    rect = (final.col * SQSIZE, final.row * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
+                    rect = (abs(final.col - self.config.show_reverse) * SQSIZE, abs(final.row - self.config.show_reverse) * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
                     pygame.draw.rect(surface, color, rect)
             else:
                 for pos in [initial, final]:
                     color = self.config.theme.trace.light if (pos.row + pos.col) % 2 == 0 else self.config.theme.trace.dark
-                    rect = (pos.col * SQSIZE, pos.row * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
+                    rect = (abs(pos.col - self.config.show_reverse) * SQSIZE, abs(pos.row - self.config.show_reverse) * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
                     pygame.draw.rect(surface, color, rect)
 
     def show_check(self, surface):
         if self.board.check_locs:
             for pos in self.board.check_locs:
                 color = ATTACK_LIGHT if (pos.row + pos.col) % 2 == 0 else ATTACK_DARK
-                rect = (pos.col * SQSIZE, pos.row * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
+                rect = (abs(pos.col - self.config.show_reverse) * SQSIZE, abs(pos.row - self.config.show_reverse) * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
                 pygame.draw.rect(surface, color, rect)
 
     def show_hover(self, surface):

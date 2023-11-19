@@ -10,6 +10,7 @@ class Main:
         self.screen = pygame.display.set_mode( (WIDTH, HEIGHT + HEIGHT_IN * 2) )
         pygame.display.set_caption('Chess')
         self.game = Game()
+        self.reversedTF = False
 
     def mainloop(self):
         while True:
@@ -21,16 +22,14 @@ class Main:
             self.game.show_pieces(self.screen)
             self.game.show_hover(self.screen)
             
-
             if self.game.dragger.dragging:
-                self.game.dragger.update_blit(self.screen)
+                self.game.dragger.update_blit(self.screen, self.reversedTF)
 
             for event in pygame.event.get():
                 # print(event)
                 if event.type == pygame.MOUSEBUTTONDOWN: # click
                     print("\nclick!") #@!
-                    self.game.dragger.update_mouse(event.pos) # position
-                    
+                    self.game.dragger.update_mouse(event.pos, self.reversedTF) # position
                     # bounded pos
                     clicked_row = (self.game.dragger.mouseY - HEIGHT_IN) // SQSIZE
                     clicked_row = max(clicked_row, 0)
@@ -43,7 +42,7 @@ class Main:
                         # valid piece (color) ?
                         if piece.color == self.game.next_player:
                             self.game.board.calc_moves(piece, clicked_row, clicked_col, testing=False)
-                            self.game.dragger.save_initial(event.pos)
+                            self.game.dragger.save_initial(event.pos, self.reversedTF)
                             self.game.dragger.drag_piece(piece)
                             
                     # show
@@ -52,18 +51,25 @@ class Main:
                     self.game.show_check(self.screen)
                     self.game.show_moves(self.screen)
                     self.game.show_pieces(self.screen)
-                    self.game.show_hover(self.screen)
                 
                 elif event.type == pygame.MOUSEMOTION: # mouse motion
                     motion_row = (event.pos[1] - HEIGHT_IN) // SQSIZE
+                    motion_col = event.pos[0] // SQSIZE
+
+                    # if self.reversedTF == 7:
+                    #     motion_row = (abs(event.pos[1] - HEIGHT) - HEIGHT_IN) // SQSIZE
+                    #     motion_col = abs(event.pos[0] - WIDTH) // SQSIZE
+
                     motion_row = max(motion_row, 0)
                     motion_row = min(motion_row, 7)
-                    motion_col = event.pos[0] // SQSIZE
+
+                    motion_col = max(motion_col, 0)
+                    motion_col = min(motion_col, 7)
 
                     self.game.set_hover(motion_row, motion_col)
 
                     if self.game.dragger.dragging:
-                        self.game.dragger.update_mouse(event.pos)
+                        self.game.dragger.update_mouse(event.pos, self.reversedTF)
 
                         # show
                         self.game.show_bg(self.screen)
@@ -73,13 +79,13 @@ class Main:
                         self.game.show_pieces(self.screen)
                         self.game.show_hover(self.screen)
 
-                        self.game.dragger.update_blit(self.screen)
+                        self.game.dragger.update_blit(self.screen, self.reversedTF)
                 
                 elif event.type == pygame.MOUSEBUTTONUP: # click release
                     print("\nrelease") #@!
                     print(f"{self.game.dragger}") #@!
                     if self.game.dragger.dragging:
-                        self.game.dragger.update_mouse(event.pos)
+                        self.game.dragger.update_mouse(event.pos, self.reversedTF)
 
                         released_row = (self.game.dragger.mouseY - HEIGHT_IN) // SQSIZE
                         released_row = max(released_row, 0)
@@ -119,8 +125,20 @@ class Main:
 
                     #  back move
                     if event.key == pygame.K_q:
-                        self.game.board.back_move()
-                        self.game.next_turn()
+                        if not self.game.dragger.dragging:
+                            if self.game.board.log_stack:
+                                self.game.next_turn()
+                            self.game.board.back_move()
+
+                    # self.game.config.show_reverse board
+                    if event.key == pygame.K_w:
+                        if not self.game.dragger.dragging:
+                            if self.reversedTF:
+                                self.game.config.show_reverse = 0
+                                self.reversedTF = False
+                            else:
+                                self.game.config.show_reverse = 7
+                                self.reversedTF = True
                     
                     # changing themes
                     if event.key == pygame.K_t:

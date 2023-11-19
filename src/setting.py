@@ -23,6 +23,8 @@ def get_alphacol(col):
 ATTACK_DARK = "#C84646"
 ATTACK_LIGHT = "#C86464"
 
+REVERSED = 0
+
 class Sound:
     def __init__(self, path):
         self.path = path
@@ -53,6 +55,7 @@ class Config:
         self.theme = self.themes[self.idx]
         self.voice_sex = 'female_voice'
         self.font = pygame.font.SysFont('monospace', 18, bold=True)
+        self.show_reverse = 0
 
         # images
         self.move_point = os.path.join(

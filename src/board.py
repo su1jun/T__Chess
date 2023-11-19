@@ -7,16 +7,16 @@ class Board:
     def __init__(self, config):
         # set of first board set
         self.squares = [[0] * ROWS for _ in range(COLS)]
-        self.last_move = None
         self.check_locs = []
         self.config = config
         self.log_stack = []
+        self.last_checked = []
         self._create()
         self._add_pieces('white') # set of first white piece
         self._add_pieces('black') # set of first black piece
 
     def move(self, piece, move, testing=False):
-        print("start move") #@!
+        # print("start move") #$%
         #@!
         logmessage = f"{piece} 의 {move}"
         if testing:
@@ -28,6 +28,14 @@ class Board:
 
         initial = move.initial
         final = move.final
+
+        flags = {
+            "moved" :  False,
+            "checked" : [],
+            "enpassant" : False,
+            "castling": False,
+        }
+        
         # console board move update
         if testing:
             en_passant_bool = initial.is_en_passant()
@@ -51,6 +59,7 @@ class Board:
                     # console board move update
                     self.squares[initial.row][initial.col + diff].piece = None
                     if not testing:
+                        flags["enpassant"] = True
                         sound = self.config.capture_sound
                         voice = self.config.en_passant_voice
                         sound.play()
@@ -106,30 +115,64 @@ class Board:
 
                     self.move(rook, move_Rook)
 
+                    flags["castling"] = True
                     sound = self.config.castling_sound
                     sound.play()
                     voice.play()
             
             # move
+            if not piece.moved: flags["moved"] = True
             piece.moved = True
 
+            # check?
+            if self.last_checked: flags["checked"] = self.last_checked
+
             # add stack
-            self.log_stack.append([piece, move])
+            self.log_stack.append([piece, move, flags])
 
-            # set last move
-            self.last_move = move
-
-        print("end move") #@!
+        # print("end move") #$%
 
     def back_move(self):
         if self.log_stack:
-            piece, move = self.log_stack.pop()
+            piece, move, flags = self.log_stack.pop()
             death_piece = move.final.piece
             move.initial, move.final = move.final, move.initial
 
-            self.move(piece, move)
+            # print("start back_move") #$%
 
-            self.squares[move.initial.row][move.initial.col].piece = death_piece
+            initial = move.initial
+            final = move.final
+
+            # console board move update
+            self.squares[initial.row][initial.col].piece = death_piece
+            self.squares[final.row][final.col].piece = piece
+
+            if isinstance(death_piece, Pawn):
+                # reset_enpassant
+                for row in range(ROWS):
+                    for col in range(COLS):
+                        if isinstance(self.squares[row][col].piece, Pawn):
+                            self.squares[row][col].piece.en_passant = False
+
+                # en passant capture
+                diff = final.col - initial.col
+                if flags["enpassant"]:
+                    # console board move update
+                    self.squares[initial.row][initial.col].piece = None
+                    self.squares[final.row][final.col - diff].piece = death_piece
+                    # set_enpassant
+                    death_piece.en_passant = True
+
+            # king castling
+            if isinstance(piece, King):
+                castling_bool = (abs(initial.col - final.col) == 2)
+                if flags["castling"]:
+                    self.back_move()
+                
+            if flags["moved"]: piece.moved = False
+            self.check_locs = flags["checked"]
+
+            # print("end back_move") #$%
 
     def valid_move(self, piece, move):
         for piece_move in piece.moves:
@@ -139,44 +182,45 @@ class Board:
         return False
 
     def in_check(self, piece, move):
-        print("start in_check") #@!
-        print(f"{piece}, {move}, in_check() -> forward_move(True)") #@!
+        # print("start in_check") #$%
+        # print(f"{piece}, {move}, in_check() -> forward_move(True)") #$%
         self.move(piece, move, testing=True)
         resulted = False
         for row in range(ROWS):
             for col in range(COLS):
                 if self.squares[row][col].has_enemy_piece(piece.color):
                     enemy_piece = self.squares[row][col].piece
-                    print(f"{enemy_piece}, in_check() -> calc_moves(True)") #@!
+                    # print(f"{enemy_piece}, in_check() -> calc_moves(True)") #$%
                     self.calc_moves(enemy_piece, row, col, testing=True)
                     for m in enemy_piece.moves:
-                        print(f"in_check : {enemy_piece}, {m}") #@!
-                        if m.final.piece:
-                            print(f"{enemy_piece} >> {m.final.piece}")
+                        # print(f"in_check : {enemy_piece}, {m}") #@!
                         if isinstance(m.final.piece, King):
-                            print("end in_check") #@!
+                            # print("end in_check") #$%
                             resulted = True
         
         move.initial, move.final = move.final, move.initial
-        print(f"{piece}, {move}, in_check() -> backwoard_move(True)") #@!
+        # print(f"{piece}, {move}, in_check() -> backwoard_move(True)") #$%
         self.move(piece, move, testing=True)
         move.initial, move.final = move.final, move.initial
         if not resulted: #@!
             print(f"{piece} 의 {move} checkIn? : {resulted}") #@!
-        print("end in_check") #@!
+        # print("end in_check") #$%
         return resulted
     
     def on_check(self, piece, move):
-        print("start on_check") #@!
+        # print("start on_check") #$%
+        # when rewind memmory check location
+        self.last_checked = self.check_locs if self.check_locs else []
+
         self.check_locs = []
         king_loc = None
-        print(f"{piece}, {move}, on_check() -> forward_move(True)") #@!
+        # print(f"{piece}, {move}, on_check() -> forward_move(True)") #$%
         self.move(piece, move, testing=True)
         for row in range(ROWS):
             for col in range(COLS):
                 if self.squares[row][col].has_team_piece(piece.color):
                     team_piece = self.squares[row][col].piece
-                    print(f"{team_piece}, on_check() -> calc_moves(True)") #@!
+                    # print(f"{team_piece}, on_check() -> calc_moves(True)") #$%
                     self.calc_moves(team_piece, row, col, testing=True)
                     for m in team_piece.moves:
                         if isinstance(m.final.piece, King):
@@ -184,7 +228,7 @@ class Board:
                             king_loc = m.final
         
         move.initial, move.final = move.final, move.initial
-        print(f"{piece}, {move}, on_check() -> backwoard_move(True)") #@!
+        # print(f"{piece}, {move}, on_check() -> backwoard_move(True)") #$%
         self.move(piece, move, testing=True)
         move.initial, move.final = move.final, move.initial
 
@@ -193,42 +237,35 @@ class Board:
             self.check_locs.append(king_loc)
         else:
             print(f"{piece} 의 {move} checkOn? : False") #@!
-        print("end on_check") #@!
+        # print("end on_check") #$%
         return self.check_locs != []
     
     def on_mate(self, piece):
-        print("start on_mate") #@!
+        # print("start on_mate") #$%
         for row in range(ROWS):
             for col in range(COLS):
                 if self.squares[row][col].has_enemy_piece(piece.color):
                     enemy_piece = self.squares[row][col].piece
-                    print(f"{enemy_piece}, on_mate() -> calc_moves_move(True)") #@!
+                    # print(f"{enemy_piece}, on_mate() -> calc_moves_move(True)") #$%
                     self.calc_moves(enemy_piece, row, col, testing=True)
                     for m in enemy_piece.moves:
-                        print(f"{enemy_piece}, {m}, on_mate() -> in_check()") #@!
+                        # print(f"{enemy_piece}, {m}, on_mate() -> in_check()") #$%
                         if not self.in_check(enemy_piece, m):
-                            print(f"###############{self.in_check(enemy_piece, m)}################") #@!
-                            print("end on_mate") #@!
+                            # print("end on_mate") #$%
                             return (False, False)
-        print("end on_mate") #@!
+        # print("end on_mate") #$%
         
         if self.check_locs:
             return (True, False)
         else:
-            print("end on_mate") #@!
+            # print("end on_mate") #$%
             return (False, True)
-    
-    def what():
-        A = False
-        if not A:
-            print(A)
-            return True
         
     def calc_moves(self, piece, row, col, testing=False):
         '''
             Calculate all the possible (valid) moves of an specific piece on a specific position
         '''
-        print("start calc_moves") #@!
+        # print("start calc_moves") #$%
         def pawn_moves():
             steps = 1 if piece.moved else 2 # steps
 
@@ -248,7 +285,7 @@ class Board:
                         if testing:
                             piece.add_move(move) # append new move
                         else:
-                            print(f"{piece}, {move}, calc_moves(False) -> in_check()") #@!
+                            # print(f"{piece}, {move}, calc_moves(False) -> in_check()") #$%
                             if not self.in_check(piece, move):
                                 piece.add_move(move) # append new move
                             
@@ -274,7 +311,7 @@ class Board:
                         if testing:
                             piece.add_move(move) # append new move
                         else:
-                            print(f"{piece}, {move}, calc_moves(False) -> in_check()") #@!
+                            # print(f"{piece}, {move}, calc_moves(False) -> in_check()") #$%
                             if not self.in_check(piece, move):
                                 piece.add_move(move) # append new move
 
@@ -297,7 +334,7 @@ class Board:
                             if testing:
                                 piece.add_move(move) # append new move
                             else:
-                                print(f"{piece}, {move}, calc_moves(False) -> in_check()") #@!
+                                # print(f"{piece}, {move}, calc_moves(False) -> in_check()") #$%
                                 if not self.in_check(piece, move):
                                     piece.add_move(move) # append new move
             
@@ -317,7 +354,7 @@ class Board:
                             if testing:
                                 piece.add_move(move) # append new move
                             else:
-                                print(f"{piece}, {move}, calc_moves(False) -> in_check()") #@!
+                                # print(f"{piece}, {move}, calc_moves(False) -> in_check()") #$%
                                 if not self.in_check(piece, move):
                                     piece.add_move(move) # append new move
 
@@ -348,7 +385,7 @@ class Board:
                         if testing:
                             piece.add_move(move) # append new move
                         else:
-                            print(f"{piece}, {move}, calc_moves(False) -> in_check()") #@!
+                            # print(f"{piece}, {move}, calc_moves(False) -> in_check()") #$%
                             if not self.in_check(piece, move):
                                 piece.add_move(move) # append new move
 
@@ -364,7 +401,7 @@ class Board:
                         if testing:
                             piece.add_move(move) # append new move
                         else:
-                            print(f"{piece}, {move}, calc_moves(False) -> in_check()") #@!
+                            # print(f"{piece}, {move}, calc_moves(False) -> in_check()") #$%
                             if not self.in_check(piece, move):
                                 piece.add_move(move) # append new move
 
@@ -388,7 +425,7 @@ class Board:
                             if testing:
                                 piece.add_move(move) # append new move
                             else:
-                                print(f"{piece}, {move}, calc_moves(False) -> in_check()") #@!
+                                # print(f"{piece}, {move}, calc_moves(False) -> in_check()") #$%
                                 if not self.in_check(piece, move):
                                     piece.add_move(move) # append new move
 
@@ -398,7 +435,7 @@ class Board:
                             if testing:
                                 piece.add_move(move) # append new move
                             else:
-                                print(f"{piece}, {move}, calc_moves(False) -> in_check()") #@!
+                                # print(f"{piece}, {move}, calc_moves(False) -> in_check()") #$%
                                 if not self.in_check(piece, move):
                                     piece.add_move(move) # append new move
                             break
@@ -441,7 +478,7 @@ class Board:
                         if testing:
                             piece.add_move(move) # append new move
                         else:
-                            print(f"{piece}, {move}, calc_moves(False) -> in_check()") #@!
+                            # print(f"{piece}, {move}, calc_moves(False) -> in_check()")#$%#@!
                             if not self.in_check(piece, move):
                                 piece.add_move(move) # append new move
 
@@ -462,7 +499,7 @@ class Board:
                             final = Square(row, 3)
                             moveK = Move(initial, final)
 
-                            print(f"{piece}, {moveK}, calc_moves(False) -> in_check()") #@!
+                            # print(f"{piece}, {moveK}, calc_moves(False) -> in_check()") #$%
 
                             if not self.in_check(piece, moveK):
 
@@ -471,12 +508,13 @@ class Board:
                                 final = Square(row, 2)
                                 moveK = Move(initial, final)
 
-                                print(f"{piece}, {moveK}, calc_moves(False) -> in_check()") #@!
+                                # print(f"{piece}, {moveK}, calc_moves(False) -> in_check()") #$%
 
                                 # check potencial checks
                                 if not self.in_check(piece, moveK):
                                     # append new move
-                                    piece.add_move(moveK) 
+                                    piece.add_move(moveK)
+                                    piece.castling = True
 
                 # right side castling
                 right_rook = self.squares[row][7].piece
@@ -493,7 +531,7 @@ class Board:
                             final = Square(row, 5)
                             moveK = Move(initial, final)
 
-                            print(f"{piece}, {moveK}, calc_moves(False) -> in_check()") #@!
+                            # print(f"{piece}, {moveK}, calc_moves(False) -> in_check()") #$%
 
                             if not self.in_check(piece, moveK):
 
@@ -502,12 +540,13 @@ class Board:
                                 final = Square(row, 6)
                                 moveK = Move(initial, final)
 
-                                print(f"{piece}, {moveK}, calc_moves(False) -> in_check()") #@!
+                                # print(f"{piece}, {moveK}, calc_moves(False) -> in_check()") #$%
 
                                 # check potencial checks
                                 if not self.in_check(piece, moveK):
                                     # append new move
-                                    piece.add_move(moveK) 
+                                    piece.add_move(moveK)
+                                    piece.castling = True
 
 
         # clear valid moves
@@ -550,7 +589,7 @@ class Board:
         elif isinstance(piece, King): 
             king_moves()
 
-        print("end calc_moves") #@!
+        # print("end calc_moves") #$%
 
     def _create(self):
         for row in range(ROWS):

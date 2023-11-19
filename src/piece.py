@@ -43,9 +43,9 @@ class Pawn(Piece):
     def __str__(self):
         s = super().__str__()
         if self.en_passant:
-            s += "_T"
+            s += "/T"
         else:
-            s += "_F"
+            s += "/F"
         return s
 
 class Knight(Piece):
@@ -68,3 +68,11 @@ class King(Piece):
     def __init__(self, color):
         self.castling = False
         super().__init__('king', color, 10000.0)
+    
+    def __str__(self):
+        s = super().__str__()
+        if self.castling:
+            s += "/T"
+        else:
+            s += "/F"
+        return s
