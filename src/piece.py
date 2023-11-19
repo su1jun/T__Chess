@@ -66,4 +66,5 @@ class Queen(Piece):
 
 class King(Piece):
     def __init__(self, color):
+        self.castling = False
         super().__init__('king', color, 10000.0)
