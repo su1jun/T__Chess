@@ -5,7 +5,7 @@
 
 - Entry point: main.py
 - Press 'q' to return the last move
-- Preww 'w' to flip the screen
+- Press 'w' to flip the screen
 - Press 'r' to restart the game  <br><br>
 
   
