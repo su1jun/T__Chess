@@ -1,12 +1,12 @@
 # Chess Game with pygame  
 
-* how to play game?  
+* how to play game?  <br>
   
 
 - Entry point: main.py
 - Press 'q' to return the last move
 - Preww 'w' to flip the screen
-- Press 'r' to restart the game  
+- Press 'r' to restart the game  <br>
 
   
 - Press 'a' to change theme
