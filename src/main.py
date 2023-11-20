@@ -11,6 +11,9 @@ class Main:
         self.screen = pygame.display.set_mode( (WIDTH, HEIGHT + HEIGHT_IN * 2) )
         pygame.display.set_caption('Chess')
         self.game = Game()
+        self.theme_change = False
+        self.voice_change = False
+        self.game_end = False
         self.reversed = False
 
     def mainloop(self):
@@ -23,6 +26,7 @@ class Main:
             self.game.show_pieces(self.screen)
             self.game.show_hover(self.screen)
             self.game.show_interface(self.screen, self.reversed)
+            if self.game_end: self.game.show_game_end(self.screen)
             
             if self.game.dragger.dragging:
                 self.game.dragger.update_blit(self.screen, self.reversed)
@@ -54,6 +58,7 @@ class Main:
                     self.game.show_moves(self.screen)
                     self.game.show_pieces(self.screen)
                     self.game.show_interface(self.screen, self.reversed)
+                    if self.game_end: self.game.show_game_end(self.screen)
                 
                 elif event.type == pygame.MOUSEMOTION: # mouse motion
                     motion_row = (event.pos[1] - HEIGHT_IN) // SQSIZE
@@ -82,6 +87,7 @@ class Main:
                         self.game.show_pieces(self.screen)
                         self.game.show_hover(self.screen)
                         self.game.show_interface(self.screen, self.reversed)
+                        if self.game_end: self.game.show_game_end(self.screen)
 
                         self.game.dragger.update_blit(self.screen, self.reversed)
                 
@@ -124,6 +130,8 @@ class Main:
                             
                             # sounds
                             self.game.play_sound(captured, checked, stalemated, checkmated)
+                            
+                            if checkmated or stalemated: self.game_end = True
 
                             # show
                             self.game.show_bg(self.screen)
@@ -131,6 +139,7 @@ class Main:
                             self.game.show_check(self.screen)
                             self.game.show_pieces(self.screen)
                             self.game.show_interface(self.screen, self.reversed)
+                            if self.game_end: self.game.show_game_end(self.screen)
 
                             # next turn
                             self.game.next_turn()
@@ -164,12 +173,22 @@ class Main:
                                 self.reversed = True
                     
                     # changing themes
-                    if event.key == pygame.K_t:
+                    if event.key == pygame.K_a:
                         self.game.change_theme()
+
+                    # changing sound
+                    if event.key == pygame.K_s:
+                        self.game.config.change_sound()
+                        self.game.config.change_voice.play()
 
                      # changing reset
                     if event.key == pygame.K_r:
+                        self.game_end = False
+                        self.theme_change = self.game.config.idx == 1
+                        self.voice_change = self.game.config.idx2 == 1
                         self.game.reset()
+                        if self.theme_change: self.game.change_theme()
+                        if self.voice_change: self.game.config.change_sound()
 
                 # quit application
                 elif event.type == pygame.QUIT:

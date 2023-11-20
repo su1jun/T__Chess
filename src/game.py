@@ -243,5 +243,11 @@ class Game:
         if stalemated:
             self.config.stalemate_voice.play()
 
+    def show_game_end(self, surface):
+        img_center = (WIDTH // 2, (HEIGHT + HEIGHT_IN * 2) // 2)
+        img = pygame.image.load(self.config.game_end)
+        img_rect = img.get_rect(center=img_center)
+        surface.blit(img, img_rect)
+
     def reset(self):
         self.__init__()

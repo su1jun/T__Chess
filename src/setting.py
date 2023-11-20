@@ -50,30 +50,35 @@ class Theme:
 class Config:
     def __init__(self):
         self.themes = []
+        self.voices = ['female_voice', 'male_voice']
         self._add_themes()
         self.idx = 0
+        self.idx2 = 0
         self.show_reverse = 0
 
         self.theme = self.themes[self.idx]
-        self.voice_sex = 'female_voice'
+        self.voice_sex = self.voices[self.idx2]
 
         self.font = pygame.font.Font(
-            os.path.join('assets', 'fonts', 'MonospaceBold.ttf')
+            os.path.join('assets', 'fonts', 'Impact.ttf')
             , 18)
         self.interfont = pygame.font.Font(
             os.path.join('assets', 'fonts', 'Blinker-Bold.ttf')
             , 24)
         
+        # images
         self.white_icon = os.path.join(
             'assets', 'images', 'white_icon.png')
         self.black_icon = os.path.join(
             'assets', 'images', 'black_icon.png')
-        
-        # images
+
         self.move_point = os.path.join(
             'assets', 'images', 'move_point.png')
         self.attack_point = os.path.join(
             'assets', 'images', 'attack_point.png')
+        
+        self.game_end = os.path.join(
+            'assets', 'images', 'game_end.png')
         
         # sounds
         self.move_sound = Sound(
@@ -87,7 +92,13 @@ class Config:
         self.promotion_sound = Sound(
             os.path.join('assets', 'sounds', 'effects', 'promotion.mp3'))
         
+        self.sound_init()
+        
+    def sound_init(self):
         # voices
+        self.change_voice = Sound(
+            os.path.join('assets', 'sounds', self.voice_sex, 'change_voice.mp3'))
+        
         self.check_voice = Sound(
             os.path.join('assets', 'sounds', self.voice_sex, 'check_voice.mp3'))
         self.checkmate_voice = Sound(
@@ -106,16 +117,19 @@ class Config:
             os.path.join('assets', 'sounds', self.voice_sex, 'en_passant_voice.mp3'))
         self.promotion_voice = Sound(
             os.path.join('assets', 'sounds', self.voice_sex, 'promotion_voice.mp3'))
-
+        
     def change_theme(self):
         self.idx += 1
         self.idx %= len(self.themes)
         self.theme = self.themes[self.idx]
 
+    def change_sound(self):
+        self.idx2 += 1
+        self.idx2 %= len(self.voices)
+        self.voice_sex = self.voices[self.idx2]
+        self.sound_init()
+
     def _add_themes(self):
         green = Theme((234, 235, 200), (119, 154, 88), (244, 247, 116), (172, 195, 51), '#C86464', '#C84646')
         brown = Theme((235, 209, 166), (165, 117, 80), (245, 234, 100), (209, 185, 59), '#C86464', '#C84646')
-        blue = Theme((229, 228, 200), (60, 95, 135), (123, 187, 227), (43, 119, 191), '#C86464', '#C84646')
-        gray = Theme((120, 119, 118), (86, 85, 84), (99, 126, 143), (82, 102, 128), '#C86464', '#C84646')
-
-        self.themes = [brown, blue, gray, green]
+        self.themes = [brown, green]
