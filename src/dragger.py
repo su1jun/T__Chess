@@ -30,7 +30,7 @@ class Dragger:
         # rect
 
         img_center = (self.mouseX, self.mouseY)
-        if reversed: img_center = (abs(self.mouseX - WIDTH), abs(self.mouseY - HEIGHT))
+        if reversed: img_center = (abs(self.mouseX - WIDTH), abs(self.mouseY - (HEIGHT + HEIGHT_IN * 2)))
         self.piece.texture_rect = img.get_rect(center=img_center)
         # blit
         surface.blit(img, self.piece.texture_rect)
@@ -38,14 +38,13 @@ class Dragger:
     # other methods
     def update_mouse(self, pos, reversed=False):
         self.mouseX, self.mouseY = pos # (xcor, ycor)
-        if reversed: self.mouseX, self.mouseY = abs(self.mouseX - WIDTH), abs(self.mouseY - HEIGHT)
+        if reversed: self.mouseX, self.mouseY = abs(self.mouseX - WIDTH), abs(self.mouseY - (HEIGHT + HEIGHT_IN * 2))
             
-
     def save_initial(self, pos, reversed=False):
         initial_row = (pos[1] - HEIGHT_IN) // SQSIZE
         initial_col = pos[0] // SQSIZE
         if reversed:
-            initial_row = (abs(pos[1] - HEIGHT) - HEIGHT_IN) // SQSIZE
+            initial_row = (abs(pos[1] - (HEIGHT + HEIGHT_IN))) // SQSIZE
             initial_col = abs(pos[0] - WIDTH) // SQSIZE
 
         initial_row = max(initial_row, 0)

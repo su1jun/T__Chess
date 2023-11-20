@@ -12,7 +12,7 @@ SQSIZE = WIDTH // COLS
 
 # Inter face
 WIDTH_IN = 720
-HEIGHT_IN = 0
+HEIGHT_IN = 60
 
 ALPHACOLS = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h'}
 
@@ -52,11 +52,23 @@ class Config:
         self.themes = []
         self._add_themes()
         self.idx = 0
-        self.theme = self.themes[self.idx]
-        self.voice_sex = 'female_voice'
-        self.font = pygame.font.SysFont('monospace', 18, bold=True)
         self.show_reverse = 0
 
+        self.theme = self.themes[self.idx]
+        self.voice_sex = 'female_voice'
+
+        self.font = pygame.font.Font(
+            os.path.join('assets', 'fonts', 'MonospaceBold.ttf')
+            , 18)
+        self.interfont = pygame.font.Font(
+            os.path.join('assets', 'fonts', 'Blinker-Bold.ttf')
+            , 24)
+        
+        self.white_icon = os.path.join(
+            'assets', 'images', 'white_icon.png')
+        self.black_icon = os.path.join(
+            'assets', 'images', 'black_icon.png')
+        
         # images
         self.move_point = os.path.join(
             'assets', 'images', 'move_point.png')

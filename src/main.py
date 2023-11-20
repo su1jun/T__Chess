@@ -2,6 +2,7 @@ import pygame, sys
 from game import Game
 from square import Square
 from move import Move
+from piece import *
 from setting import *
 
 class Main:
@@ -10,7 +11,7 @@ class Main:
         self.screen = pygame.display.set_mode( (WIDTH, HEIGHT + HEIGHT_IN * 2) )
         pygame.display.set_caption('Chess')
         self.game = Game()
-        self.reversedTF = False
+        self.reversed = False
 
     def mainloop(self):
         while True:
@@ -21,15 +22,16 @@ class Main:
             self.game.show_moves(self.screen)
             self.game.show_pieces(self.screen)
             self.game.show_hover(self.screen)
+            self.game.show_interface(self.screen, self.reversed)
             
             if self.game.dragger.dragging:
-                self.game.dragger.update_blit(self.screen, self.reversedTF)
+                self.game.dragger.update_blit(self.screen, self.reversed)
 
             for event in pygame.event.get():
                 # print(event)
                 if event.type == pygame.MOUSEBUTTONDOWN: # click
                     print("\nclick!") #@!
-                    self.game.dragger.update_mouse(event.pos, self.reversedTF) # position
+                    self.game.dragger.update_mouse(event.pos, self.reversed) # position
                     # bounded pos
                     clicked_row = (self.game.dragger.mouseY - HEIGHT_IN) // SQSIZE
                     clicked_row = max(clicked_row, 0)
@@ -42,7 +44,7 @@ class Main:
                         # valid piece (color) ?
                         if piece.color == self.game.next_player:
                             self.game.board.calc_moves(piece, clicked_row, clicked_col, testing=False)
-                            self.game.dragger.save_initial(event.pos, self.reversedTF)
+                            self.game.dragger.save_initial(event.pos, self.reversed)
                             self.game.dragger.drag_piece(piece)
                             
                     # show
@@ -51,12 +53,13 @@ class Main:
                     self.game.show_check(self.screen)
                     self.game.show_moves(self.screen)
                     self.game.show_pieces(self.screen)
+                    self.game.show_interface(self.screen, self.reversed)
                 
                 elif event.type == pygame.MOUSEMOTION: # mouse motion
                     motion_row = (event.pos[1] - HEIGHT_IN) // SQSIZE
                     motion_col = event.pos[0] // SQSIZE
 
-                    # if self.reversedTF == 7:
+                    # if self.reversed == 7:
                     #     motion_row = (abs(event.pos[1] - HEIGHT) - HEIGHT_IN) // SQSIZE
                     #     motion_col = abs(event.pos[0] - WIDTH) // SQSIZE
 
@@ -69,7 +72,7 @@ class Main:
                     self.game.set_hover(motion_row, motion_col)
 
                     if self.game.dragger.dragging:
-                        self.game.dragger.update_mouse(event.pos, self.reversedTF)
+                        self.game.dragger.update_mouse(event.pos, self.reversed)
 
                         # show
                         self.game.show_bg(self.screen)
@@ -78,14 +81,15 @@ class Main:
                         self.game.show_moves(self.screen)
                         self.game.show_pieces(self.screen)
                         self.game.show_hover(self.screen)
+                        self.game.show_interface(self.screen, self.reversed)
 
-                        self.game.dragger.update_blit(self.screen, self.reversedTF)
+                        self.game.dragger.update_blit(self.screen, self.reversed)
                 
                 elif event.type == pygame.MOUSEBUTTONUP: # click release
                     print("\nrelease") #@!
                     print(f"{self.game.dragger}") #@!
                     if self.game.dragger.dragging:
-                        self.game.dragger.update_mouse(event.pos, self.reversedTF)
+                        self.game.dragger.update_mouse(event.pos, self.reversed)
 
                         released_row = (self.game.dragger.mouseY - HEIGHT_IN) // SQSIZE
                         released_row = max(released_row, 0)
@@ -102,9 +106,21 @@ class Main:
                             captured = self.game.board.squares[released_row][released_col].has_piece()
                             checked = self.game.board.on_check(self.game.dragger.piece, move)
 
+                            if captured:
+                                piece = self.game.board.squares[released_row][released_col].piece
+                                self.game.death_pieces[piece.color][piece.name] += 1
+
                             # normal capture
                             self.game.board.move(self.game.dragger.piece, move)
                             checkmated, stalemated = self.game.board.on_mate(self.game.dragger.piece)
+
+                            # en_passant?
+                            if self.game.board.log_stack:
+                                piece = self.game.board.log_stack[-1][1].final.piece
+                                if isinstance(piece, Pawn):
+                                    if piece.en_passant:
+                                        # color = "white" if piece.color == "black" else "black"
+                                        self.game.death_pieces[piece.color]["pawn"] += 1
                             
                             # sounds
                             self.game.play_sound(captured, checked, stalemated, checkmated)
@@ -114,6 +130,7 @@ class Main:
                             self.game.show_last_move(self.screen)
                             self.game.show_check(self.screen)
                             self.game.show_pieces(self.screen)
+                            self.game.show_interface(self.screen, self.reversed)
 
                             # next turn
                             self.game.next_turn()
@@ -127,18 +144,24 @@ class Main:
                     if event.key == pygame.K_q:
                         if not self.game.dragger.dragging:
                             if self.game.board.log_stack:
+                                if self.game.board.log_stack:
+                                    if self.game.board.log_stack[-1][1].final.has_piece():       
+                                        piece = self.game.board.log_stack[-1][1].final.piece
+                                        self.game.death_pieces[piece.color][piece.name] -= 1
+
                                 self.game.next_turn()
+                                
                             self.game.board.back_move()
 
                     # self.game.config.show_reverse board
                     if event.key == pygame.K_w:
                         if not self.game.dragger.dragging:
-                            if self.reversedTF:
+                            if self.reversed:
                                 self.game.config.show_reverse = 0
-                                self.reversedTF = False
+                                self.reversed = False
                             else:
                                 self.game.config.show_reverse = 7
-                                self.reversedTF = True
+                                self.reversed = True
                     
                     # changing themes
                     if event.key == pygame.K_t:

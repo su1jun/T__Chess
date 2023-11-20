@@ -4,7 +4,6 @@ from dragger import Dragger
 from square import Square
 from setting import *
 from piece import *
-from interface import Interface
 
 class Game:
     def __init__(self):
@@ -13,8 +12,24 @@ class Game:
         self.config = Config()
         self.board = Board(self.config)
         self.dragger = Dragger()
-        self.interface_white = Interface("player 1", "white")
-        self.interface_black = Interface("player 2", "black")
+
+        self.death_pieces = {
+            "white" : {
+                "pawn" : 0,
+                "bishop" : 0,
+                "knight" : 0,
+                "rook" : 0,
+                "queen" : 0,
+            },
+            "black" : {
+                "pawn" : 0,
+                "bishop" : 0,
+                "knight" : 0,
+                "rook" : 0,
+                "queen" : 0,
+            }
+        }
+
 
     # blit methods
     def show_bg(self, surface):
@@ -53,8 +68,85 @@ class Game:
                         piece.texture_rect = img.get_rect(center=img_center)
                         surface.blit(img, piece.texture_rect)
 
-    def show_inter(self, surface):
-            pass
+    def show_interface(self, surface, reversed=False):
+        BLACK = (17, 17, 17)
+        WHITE = (221, 221, 221)
+        GRAY = (77, 77, 77)
+        
+        if reversed:
+            white_rect = 0
+            black_rect = HEIGHT + HEIGHT_IN
+            white_height = HEIGHT_IN * 0.5
+            black_height = HEIGHT + HEIGHT_IN * 1.5
+        else:
+            white_rect = HEIGHT + HEIGHT_IN
+            black_rect = 0
+            white_height = HEIGHT + HEIGHT_IN * 1.5
+            black_height = HEIGHT_IN * 0.5
+
+        if self.next_player == 'black':
+            box_rect = pygame.Rect(0, black_rect, WIDTH, HEIGHT_IN)
+            pygame.draw.rect(surface, BLACK, box_rect)
+
+            box_rect = pygame.Rect(0, white_rect, WIDTH, HEIGHT_IN)
+            pygame.draw.rect(surface, GRAY, box_rect)
+
+        else:
+            box_rect = pygame.Rect(0, black_rect, WIDTH, HEIGHT_IN)
+            pygame.draw.rect(surface, GRAY, box_rect)
+
+            box_rect = pygame.Rect(0, white_rect, WIDTH, HEIGHT_IN)
+            pygame.draw.rect(surface, BLACK, box_rect)
+
+        # upper-side #
+
+        # icons
+        img = pygame.image.load(self.config.black_icon)
+        img_center = SQSIZE // 2 - 15, black_height
+        surface.blit(img, img.get_rect(center=img_center))
+
+        # player
+        player_font = self.config.interfont.render('Player 2', 1, WHITE)
+        player_font_pos = (SQSIZE - 25, black_height - 15)
+        surface.blit(player_font, player_font_pos)
+        
+        initial_x = WIDTH - SQSIZE // 2 + 15
+        initial_y = black_height
+        for pieces in self.death_pieces['white']:
+            texture = os.path.join('assets', 'images', f'imgs-30px/white_{pieces}.png')
+            cnt = self.death_pieces['white'][pieces]
+            for _ in range(cnt):
+                img = pygame.image.load(texture)
+                img_center = initial_x, initial_y
+                surface.blit(img, img.get_rect(center=img_center))
+                initial_x -= 15
+            if cnt:
+                initial_x -= 15
+
+        # bottom-side #
+        
+        # icons
+        img = pygame.image.load(self.config.white_icon)
+        img_center = SQSIZE // 2 - 15, white_height
+        surface.blit(img, img.get_rect(center=img_center))
+
+        # player
+        player_font = self.config.interfont.render('Player 1', 1, WHITE)
+        player_font_pos = (SQSIZE - 25, white_height - 15)
+        surface.blit(player_font, player_font_pos)
+
+        initial_x = WIDTH - SQSIZE // 2 + 15
+        initial_y = white_height
+        for pieces in self.death_pieces['black']:
+            texture = os.path.join('assets', 'images', f'imgs-30px/black_{pieces}.png')
+            cnt = self.death_pieces['black'][pieces]
+            for _ in range(self.death_pieces['black'][pieces]):
+                img = pygame.image.load(texture)
+                img_center = initial_x, initial_y
+                surface.blit(img, img.get_rect(center=img_center))
+                initial_x -= 15
+            if cnt:
+                initial_x -= 15
 
     def show_moves(self, surface): # +attack mark
         if self.dragger.dragging:
