@@ -1,6 +1,6 @@
 # Chess Game with pygame  
 
-* how to play game?  <br>
+* how to play game?  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
   
 
 - Entry point: main.py
