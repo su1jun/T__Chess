@@ -1,6 +1,7 @@
 # Chess Game with pygame
 
 * how to play game?
+  
 
 - Entry point: main.py
 - Press 'q' to return the last move
