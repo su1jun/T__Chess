@@ -32,16 +32,13 @@ class Main:
                 self.game.dragger.update_blit(self.screen, self.reversed)
 
             for event in pygame.event.get():
-                # print(event)
                 if event.type == pygame.MOUSEBUTTONDOWN: # click
-                    print("\nclick!") #@!
                     self.game.dragger.update_mouse(event.pos, self.reversed) # position
                     # bounded pos
                     clicked_row = (self.game.dragger.mouseY - HEIGHT_IN) // SQSIZE
                     clicked_row = max(clicked_row, 0)
                     clicked_row = min(clicked_row, 7)
                     clicked_col = self.game.dragger.mouseX // SQSIZE
-                    print(f"{self.game.board.squares[clicked_row][clicked_col]}") #@!
                     # if clicked square has a piece ?
                     if self.game.board.squares[clicked_row][clicked_col].has_piece():
                         piece = self.game.board.squares[clicked_row][clicked_col].piece
@@ -63,10 +60,6 @@ class Main:
                 elif event.type == pygame.MOUSEMOTION: # mouse motion
                     motion_row = (event.pos[1] - HEIGHT_IN) // SQSIZE
                     motion_col = event.pos[0] // SQSIZE
-
-                    # if self.reversed == 7:
-                    #     motion_row = (abs(event.pos[1] - HEIGHT) - HEIGHT_IN) // SQSIZE
-                    #     motion_col = abs(event.pos[0] - WIDTH) // SQSIZE
 
                     motion_row = max(motion_row, 0)
                     motion_row = min(motion_row, 7)
@@ -92,8 +85,6 @@ class Main:
                         self.game.dragger.update_blit(self.screen, self.reversed)
                 
                 elif event.type == pygame.MOUSEBUTTONUP: # click release
-                    print("\nrelease") #@!
-                    print(f"{self.game.dragger}") #@!
                     if self.game.dragger.dragging:
                         self.game.dragger.update_mouse(event.pos, self.reversed)
 
@@ -101,7 +92,7 @@ class Main:
                         released_row = max(released_row, 0)
                         released_row = min(released_row, 7)
                         released_col = self.game.dragger.mouseX // SQSIZE
-                        print(f"{self.game.board.squares[released_row][released_col]}") #@!
+
                         # create possible move
                         initial = Square(self.game.dragger.initial_row, self.game.dragger.initial_col)
                         final = Square(released_row, released_col)
@@ -125,7 +116,6 @@ class Main:
                                 piece = self.game.board.log_stack[-1][1].final.piece
                                 if isinstance(piece, Pawn):
                                     if piece.en_passant:
-                                        # color = "white" if piece.color == "black" else "black"
                                         self.game.death_pieces[piece.color]["pawn"] += 1
                             
                             # sounds

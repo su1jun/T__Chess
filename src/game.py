@@ -64,7 +64,6 @@ class Game:
                         piece.set_texture(size=80)
                         img = pygame.image.load(piece.texture)
                         img_center = abs(col - self.config.show_reverse) * SQSIZE + SQSIZE // 2, abs(row - self.config.show_reverse) * SQSIZE + SQSIZE // 2 + HEIGHT_IN
-                        # print(f"{piece}, 위치 {abs(col - self.config.show_reverse)}, {abs(row - self.config.show_reverse)}")
                         piece.texture_rect = img.get_rect(center=img_center)
                         surface.blit(img, piece.texture_rect)
 
@@ -179,9 +178,6 @@ class Game:
                 else:
                     img = pygame.image.load(self.config.move_point)
                     img_rect = img.get_rect(center=img_center)
-                #$%
-                # surface.fill(color, img_rect)
-                # self.show_last_move(surface, move.final)
                 surface.blit(img, img_rect)
 
     def show_last_move(self, surface, move=None):
