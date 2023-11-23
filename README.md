@@ -12,13 +12,12 @@ Simply <b>grab</b> the piece you wish to move and <b>drag & drop</b> it to the d
 <p>
 <b>Entry point</b>: Start the game via <b>src/main.py</b>, or use <b>chess.exe</b> if you are a Windows 11 user.<br>
 <br>
-
 <b>↩️ 'q' :</b> <b>Undo</b> the last move<br>
 <b>🌀 'w' :</b> <b>Flip</b> the screen<br>
 <b>🔃 'r' :</b> <b>restart</b> the game<br>
 
 <b>✍️ 'a' :</b> change <b>theme</b><br>
-<b>🔊 'b' :</b> change <b>voice</b><br>
+<b>🔊 'b' :</b> change <b>voice</b>
 </p>
 <br>
 
