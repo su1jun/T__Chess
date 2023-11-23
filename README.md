@@ -1,13 +1,12 @@
-<h1>Chess 🐴</h1>
+<h1>🐎 Chess 🐴</h1>
 <br>
 
 <h2>📒Game Description</h2>
 <p>
 Welcome to the <b>Chess Game!</b> <br>
 Simply <b>grab</b> the piece you wish to move and <b>drag & drop</b> it to the desired location. <br>
-
 </p>
-<hr><br>
+<br>
 
 <h2>📃Manual</h2>
 <p>
@@ -21,7 +20,7 @@ Simply <b>grab</b> the piece you wish to move and <b>drag & drop</b> it to the d
 <b>✍️ 'a' :</b> change <b>theme</b><br>
 <b>🔊 'b' :</b> change <b>voice</b><br>
 </p>
-<hr><br>
+<br>
 
 <h2>📚References & Credits</h2>
 <p>
@@ -30,7 +29,6 @@ Simply <b>grab</b> the piece you wish to move and <b>drag & drop</b> it to the d
     <b>Sound Voices :</b> https://ttsmp3.com/<br>
     <b>Other Sources :</b> su1jun<br>
 </p>
-
-<hr>
+<br>
 
 <p>© 2023 su1jun. Creative Commons Attribution.</p>
