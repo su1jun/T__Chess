@@ -143,10 +143,11 @@ class Main:
                     if event.key == pygame.K_q:
                         if not self.game.dragger.dragging:
                             if self.game.board.log_stack:
-                                if self.game.board.log_stack:
-                                    if self.game.board.log_stack[-1][1].final.has_piece():       
-                                        piece = self.game.board.log_stack[-1][1].final.piece
-                                        self.game.death_pieces[piece.color][piece.name] -= 1
+                                if self.game.board.log_stack[-1][1].final.has_piece():       
+                                    piece = self.game.board.log_stack[-1][1].final.piece
+                                    self.game.death_pieces[piece.color][piece.name] -= 1
+
+                                if self.game_end: self.game_end = False
 
                                 self.game.next_turn()
                                 

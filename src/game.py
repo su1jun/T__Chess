@@ -30,7 +30,6 @@ class Game:
             }
         }
 
-
     # blit methods
     def show_bg(self, surface):
         for row in range(ROWS):
