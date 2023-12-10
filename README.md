@@ -10,6 +10,7 @@ Simply <b>grab</b> the piece you wish to move and <b>drag & drop</b> it to the d
 
 <h2>📒Demo Play</h2>
 https://github.com/su1jun/Chess/assets/120762843/5ffe04f7-0596-4d0a-a416-d0336becc4b8
+<br>
 
 <h2>📒Multiple Implementations</h2>
 
@@ -20,8 +21,7 @@ https://github.com/su1jun/Chess/assets/120762843/89e505e4-6a91-4a25-b70b-dcbbaf7
 https://github.com/su1jun/Chess/assets/120762843/2200d10b-7fae-4ded-bdfc-c95dbebed1c3
 
 https://github.com/su1jun/Chess/assets/120762843/d56b5bca-fda3-4ac5-80ec-b45797123566
-
-
+<br>
 
 <h2>📃Manual</h2>
 <p>
@@ -48,7 +48,7 @@ https://github.com/su1jun/Chess/assets/120762843/a6933518-e697-46b2-ba61-0efc567
 
 <h2>📚References & Credits</h2>
 <p>
-    <b>Code reference :</b> https://github.com/AlejoG10/python-chess-ai-yt<br>
+    <b>AI reference :</b> https://stockfishchess.org/<br>
     <b>Chess images, Sound effects :</b> https://www.chess.com/<br>
     <b>Sound Voices :</b> https://ttsmp3.com/<br>
     <b>Other Sources :</b> su1jun<br>
