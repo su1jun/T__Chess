@@ -14,6 +14,13 @@ https://github.com/su1jun/Chess/assets/120762843/5ffe04f7-0596-4d0a-a416-d0336be
 
 <h2>📒Multiple Implementations</h2>
 
+https://github.com/su1jun/Chess/assets/120762843/bc23c0ba-a476-4636-890b-3b55ae70284c
+
+https://github.com/su1jun/Chess/assets/120762843/89e505e4-6a91-4a25-b70b-dcbbaf77aebb
+
+https://github.com/su1jun/Chess/assets/120762843/2200d10b-7fae-4ded-bdfc-c95dbebed1c3
+
+https://github.com/su1jun/Chess/assets/120762843/d56b5bca-fda3-4ac5-80ec-b45797123566
 <br>
 
 <h2>📃Manual</h2>
