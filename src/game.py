@@ -30,6 +30,84 @@ class Game:
             }
         }
 
+    def show_title(self, surface):
+        BLACK = (17, 17, 17)
+        WHITE = (221, 221, 221)
+
+        box_rect = pygame.Rect(0, 0, WIDTH, HEIGHT_IN)
+        pygame.draw.rect(surface, BLACK, box_rect)
+
+        box_rect = pygame.Rect(0, HEIGHT_IN, WIDTH, HEIGHT)
+        pygame.draw.rect(surface, WHITE, box_rect)
+
+        box_rect = pygame.Rect(0, HEIGHT + HEIGHT_IN, WIDTH, HEIGHT_IN)
+        pygame.draw.rect(surface, BLACK, box_rect)
+
+        img = pygame.image.load(self.config.game_title)
+        img_center = WIDTH // 2 + 5, 180 + HEIGHT_IN
+        surface.blit(img, img.get_rect(center=img_center))
+
+    def show_title_btn(self, surface, bool1, bool2):
+        if bool1:
+            img = pygame.image.load(self.config.people1_btn_gray)
+        else:
+            img = pygame.image.load(self.config.people1_btn)
+
+        img_center = WIDTH // 2 + 5, 420 + HEIGHT_IN
+        surface.blit(img, img.get_rect(center=img_center))
+
+        if bool2:
+            img = pygame.image.load(self.config.people2_btn_gray)
+        else:
+            img = pygame.image.load(self.config.people2_btn)
+
+        img_center = WIDTH // 2 + 5, 580 + HEIGHT_IN
+        surface.blit(img, img.get_rect(center=img_center))
+
+    def show_setting_btn(self, surface, bool1, bool2, bool3, bool4, bool5):
+        if bool1:
+            img = pygame.image.load(self.config.left_btn_gray)
+        else:
+            img = pygame.image.load(self.config.left_btn)
+        img_center = WIDTH // 2 - 150, 335 + HEIGHT_IN
+        surface.blit(img, img.get_rect(center=img_center))
+
+        if bool2:
+            img = pygame.image.load(self.config.right_btn_gray)
+        else:
+            img = pygame.image.load(self.config.right_btn)
+        img_center = WIDTH // 2 + 150, 335 + HEIGHT_IN
+        surface.blit(img, img.get_rect(center=img_center))
+
+        if bool3:
+            img = pygame.image.load(self.config.white_com_selected)
+        else:
+            img = pygame.image.load(self.config.white_com)
+        img_center = WIDTH // 2 - 100, 470 + HEIGHT_IN
+        surface.blit(img, img.get_rect(center=img_center))
+
+        if bool4:
+            img = pygame.image.load(self.config.black_com_selected)
+        else:
+            img = pygame.image.load(self.config.black_com)
+        img_center = WIDTH // 2 + 100, 470 + HEIGHT_IN
+        surface.blit(img, img.get_rect(center=img_center))
+
+        if bool5:
+            img = pygame.image.load(self.config.people1_btn_gray)
+        else:
+            img = pygame.image.load(self.config.people1_btn)
+        
+        img_center = WIDTH // 2 + 5, 640 + HEIGHT_IN
+        surface.blit(img, img.get_rect(center=img_center))
+
+    def show_level(self, surface, level):
+        BLACK = (17, 17, 17)
+        level_str = (2 - len(str(level))) * '0' + str(level)
+        lv_font = self.config.lvfont.render(f'Lv : {level_str}', 1, BLACK)
+        lv_font_pos = (WIDTH // 2 - 55, 305 + HEIGHT_IN)
+        surface.blit(lv_font, lv_font_pos)
+
     # blit methods
     def show_bg(self, surface):
         for row in range(ROWS):
@@ -66,7 +144,7 @@ class Game:
                         piece.texture_rect = img.get_rect(center=img_center)
                         surface.blit(img, piece.texture_rect)
 
-    def show_interface(self, surface, reversed=False):
+    def show_interface(self, surface, reversed, game_mode, level):
         BLACK = (17, 17, 17)
         WHITE = (221, 221, 221)
         GRAY = (77, 77, 77)
@@ -96,6 +174,22 @@ class Game:
             box_rect = pygame.Rect(0, white_rect, WIDTH, HEIGHT_IN)
             pygame.draw.rect(surface, BLACK, box_rect)
 
+        box_rect = pygame.Rect(405, 46, 300, 3)
+        pygame.draw.rect(surface, WHITE, box_rect)
+
+        box_rect = pygame.Rect(405, HEIGHT + HEIGHT_IN + 46, 300, 3)
+        pygame.draw.rect(surface, WHITE, box_rect)
+
+        if game_mode == 1:
+            white_side_txt = 'Player'
+            black_side_txt = f'Lv.{level} Computer'
+        elif game_mode == 2:
+            white_side_txt = f'Lv.{level} Computer'
+            black_side_txt = 'Player'
+        else:
+            white_side_txt = 'Player 1'
+            black_side_txt = 'Player 2'
+
         # upper-side #
 
         # icons
@@ -104,12 +198,12 @@ class Game:
         surface.blit(img, img.get_rect(center=img_center))
 
         # player
-        player_font = self.config.interfont.render('Player 2', 1, WHITE)
+        player_font = self.config.interfont.render(black_side_txt, 1, WHITE)
         player_font_pos = (SQSIZE - 25, black_height - 15)
         surface.blit(player_font, player_font_pos)
         
         initial_x = WIDTH - SQSIZE // 2 + 15
-        initial_y = black_height
+        initial_y = black_height - 3
         for pieces in self.death_pieces['white']:
             texture = os.path.join('assets', 'images', f'imgs-30px/white_{pieces}.png')
             cnt = self.death_pieces['white'][pieces]
@@ -129,12 +223,12 @@ class Game:
         surface.blit(img, img.get_rect(center=img_center))
 
         # player
-        player_font = self.config.interfont.render('Player 1', 1, WHITE)
+        player_font = self.config.interfont.render(white_side_txt, 1, WHITE)
         player_font_pos = (SQSIZE - 25, white_height - 15)
         surface.blit(player_font, player_font_pos)
 
         initial_x = WIDTH - SQSIZE // 2 + 15
-        initial_y = white_height
+        initial_y = white_height - 3
         for pieces in self.death_pieces['black']:
             texture = os.path.join('assets', 'images', f'imgs-30px/black_{pieces}.png')
             cnt = self.death_pieces['black'][pieces]
@@ -150,16 +244,16 @@ class Game:
         if self.dragger.dragging:
             piece = self.dragger.piece
             for move in piece.moves:
+                initial = move.initial
                 final = move.final
 
                 img_center = ((abs(final.col - self.config.show_reverse) + 0.5) * SQSIZE, (abs(final.row - self.config.show_reverse) + 0.5) * SQSIZE + HEIGHT_IN)
                 color = self.config.theme.bg.light if (final.row + final.col) % 2 == 0 else self.config.theme.bg.dark
                 if final.has_enemy_piece(self.next_player):
-                    if final.is_en_passant() and (final.row == 2 or final.row == 5):
-                        temp = 1 if self.next_player == 'white' else -1 # white == 1, black == -1
-                        color = self.config.theme.bg.light if (final.row + temp + final.col) % 2 == 0 else self.config.theme.bg.dark
+                    if final.en_passant and (final.row == 2 or final.row == 5):
+                        color = self.config.theme.bg.light if (initial.row + final.col) % 2 == 0 else self.config.theme.bg.dark
 
-                        img_center = ((abs(final.col - self.config.show_reverse) + 0.5) * SQSIZE, (abs(final.row - self.config.show_reverse) + temp + 0.5) * SQSIZE + HEIGHT_IN)
+                        img_center = ((abs(final.col - self.config.show_reverse) + 0.5) * SQSIZE, (abs(initial.row - self.config.show_reverse) + 0.5) * SQSIZE + HEIGHT_IN)
                         img = pygame.image.load(self.config.attack_point)
                         img_rect = img.get_rect(center=img_center)
 
@@ -167,7 +261,7 @@ class Game:
                         self.show_last_move(surface, final)
                         surface.blit(img, img_rect)
 
-                        img_center = (((final.col - self.config.show_reverse) + 0.5) * SQSIZE, ((final.row - self.config.show_reverse) + 0.5) * SQSIZE + HEIGHT_IN)
+                        img_center = ((abs(final.col - self.config.show_reverse) + 0.5) * SQSIZE, (abs(final.row - self.config.show_reverse) + 0.5) * SQSIZE + HEIGHT_IN)
                         color = self.config.theme.bg.light if (final.row + final.col) % 2 == 0 else self.config.theme.bg.dark
                         img = pygame.image.load(self.config.move_point)
                         img_rect = img.get_rect(center=img_center)
@@ -189,7 +283,7 @@ class Game:
                     color = self.config.theme.trace.light if (initial.row + initial.col) % 2 == 0 else self.config.theme.trace.dark
                     rect = (abs(initial.col - self.config.show_reverse) * SQSIZE, abs(initial.row - self.config.show_reverse) * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
                     pygame.draw.rect(surface, color, rect)
-                elif move == final or move.is_en_passant():
+                elif move == final or move.en_passant:
                     color = self.config.theme.trace.light if (final.row + final.col) % 2 == 0 else self.config.theme.trace.dark
                     rect = (abs(final.col - self.config.show_reverse) * SQSIZE, abs(final.row - self.config.show_reverse) * SQSIZE + HEIGHT_IN, SQSIZE, SQSIZE)
                     pygame.draw.rect(surface, color, rect)

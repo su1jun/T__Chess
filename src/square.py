@@ -6,6 +6,7 @@ class Square:
         self.row = row
         self.col = col
         self.piece = piece
+        self.en_passant = enpassant
         self.alphacol = ALPHACOLS[col]
 
     def __eq__(self, other):
@@ -15,6 +16,7 @@ class Square:
         s = ''
         s += f'({self.alphacol}{8 - self.row} '
         s += f'{self.piece})'
+        s += f'{self.en_passant})'
         return s
 
     def has_piece(self):
@@ -34,9 +36,6 @@ class Square:
             > empty (1) or enemy (!= color)
         '''
         return self.isempty() or self.has_enemy_piece(color)
-    
-    def is_en_passant(self):
-        return isinstance(self.piece, Pawn) and self.piece.en_passant
 
     @staticmethod
     def in_range(*args):

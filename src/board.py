@@ -15,6 +15,38 @@ class Board:
         self._add_pieces('white') # set of first white piece
         self._add_pieces('black') # set of first black piece
 
+    def board_to_fen(self):
+        fen = ''
+        for row in range(ROWS):
+            blank_cnt = 0
+            for col in range(COLS):
+                if self.squares[row][col].has_piece():
+                    if blank_cnt:
+                        fen += str(blank_cnt)
+                        blank_cnt = 0
+
+                    if isinstance(self.squares[row][col].piece, Pawn):
+                        fen += 'P' if self.squares[row][col].piece.color == 'white' else 'p'
+                    elif isinstance(self.squares[row][col].piece, Knight):
+                        fen += 'N' if self.squares[row][col].piece.color == 'white' else 'n'
+                    elif isinstance(self.squares[row][col].piece, Bishop):
+                        fen += 'B' if self.squares[row][col].piece.color == 'white' else 'b'
+                    elif isinstance(self.squares[row][col].piece, Rook):
+                        fen += 'R' if self.squares[row][col].piece.color == 'white' else 'r'
+                    elif isinstance(self.squares[row][col].piece, Queen):
+                        fen += 'Q' if self.squares[row][col].piece.color == 'white' else 'q'
+                    elif isinstance(self.squares[row][col].piece, King):
+                        fen += 'K' if self.squares[row][col].piece.color == 'white' else 'k'
+
+                else:
+                    blank_cnt += 1
+
+            if blank_cnt:
+                fen += str(blank_cnt)
+            fen += '/'
+        fen = fen[:-1]
+        return fen
+
     def move(self, piece, move, testing=False):
 
         initial = move.initial
@@ -28,24 +60,39 @@ class Board:
         }
         
         # console board move update
+        en_passant_bool = final.en_passant
+        diff = final.col - initial.col
+        
         if testing:
-            en_passant_bool = initial.is_en_passant()
-            if en_passant_bool:
-                diff = final.col - initial.col
+            en_passant_bool_initial = initial.en_passant
+            if en_passant_bool_initial:
                 self.squares[initial.row][initial.col].piece = None
-                self.squares[final.row][final.col - diff].piece = initial.piece
+                self.squares[final.row][initial.col].piece = initial.piece
+                self.squares[final.row][final.col].piece = piece
+
+            elif en_passant_bool:
+                self.squares[initial.row][initial.col].piece = None
+                self.squares[initial.row][final.col].piece = None
+                self.squares[final.row][final.col].piece = piece
+
             else:
                 self.squares[initial.row][initial.col].piece = initial.piece
+                self.squares[final.row][final.col].piece = piece
+            
         else:
             self.squares[initial.row][initial.col].piece = None
+            # captuered en_passant_piece will process later
+            self.squares[final.row][final.col].piece = piece
 
-        self.squares[final.row][final.col].piece = piece
+        # reset_enpassant
+        if not testing:
+            for row in range(ROWS):
+                for col in range(COLS):
+                    self.squares[row][col].en_passant = False
 
         if isinstance(piece, Pawn):
             # en passant capture
-            diff = final.col - initial.col
             if diff != 0:
-                en_passant_bool = final.is_en_passant()
                 if en_passant_bool:
                     # console board move update
                     self.squares[initial.row][initial.col + diff].piece = None
@@ -56,21 +103,13 @@ class Board:
                         sound.play()
                         voice.play()
 
-            if not testing:
-                # reset_enpassant
-                for row in range(ROWS):
-                    for col in range(COLS):
-                        if isinstance(self.squares[row][col].piece, Pawn):
-                            self.squares[row][col].piece.en_passant = False
-
             # set_enpassant
             r = 4 if piece.color == 'white' else 3
+            fr = 5 if piece.color == 'white' else 2
             if not piece.moved and final.row == r:
-                for c in [1, -1]:
-                    if Square.in_range(move.final.col+c):
-                        check_piece = self.squares[r][move.final.col+c].piece
-                        if isinstance(check_piece, Pawn) and piece.color != check_piece.color:
-                            piece.en_passant = True
+                if Square.in_range(final.col):
+                    self.squares[fr][final.col].en_passant = True
+                    flags["enpassant"] = (fr, final.col)
 
             # pawn promotion
             check_promotion = (final.row == 0 or final.row == 7)
@@ -87,7 +126,6 @@ class Board:
             if isinstance(piece, King):
                 castling_bool = (abs(initial.col - final.col) == 2)
                 if castling_bool:
-                    diff = final.col - initial.col
                     side = diff < 0 # True : left, False : right
                     if side:
                         rook = self.squares[final.row][0].piece
@@ -134,22 +172,30 @@ class Board:
             self.squares[initial.row][initial.col].piece = death_piece
             self.squares[final.row][final.col].piece = piece
 
-            if isinstance(death_piece, Pawn):
-                # reset_enpassant
-                for row in range(ROWS):
-                    for col in range(COLS):
-                        if isinstance(self.squares[row][col].piece, Pawn):
-                            self.squares[row][col].piece.en_passant = False
+            # reset_enpassant
+            for row in range(ROWS):
+                for col in range(COLS):
+                    self.squares[row][col].en_passant = False
 
+            if isinstance(death_piece, Pawn):
                 # en passant capture
-                diff = final.col - initial.col
-                if flags["enpassant"]:
+                if flags["enpassant"] == True:
                     # console board move update
                     self.squares[initial.row][initial.col].piece = None
-                    self.squares[final.row][final.col - diff].piece = death_piece
-                    # set_enpassant
-                    death_piece.en_passant = True
+                    self.squares[final.row][initial.col].piece = death_piece
+                    self.squares[initial.row][initial.col].en_passant = True
 
+            if isinstance(piece, Pawn):
+                if self.log_stack:
+                    enpassant_flags = self.log_stack[-1][2]["enpassant"]
+                # en passant capture
+                try:
+                    if type(enpassant_flags) == tuple:
+                        r, c = enpassant_flags
+                        self.squares[r][c].en_passant = True
+                except:
+                    print("back move disgard")
+                    
             # king castling
             if isinstance(piece, King):
                 if flags["castling"]:
@@ -279,10 +325,10 @@ class Board:
                 if self.squares[row][col-1].has_enemy_piece(piece.color):
                     p = self.squares[row][col-1].piece
                     if isinstance(p, Pawn):
-                        if p.en_passant:
+                        if self.squares[fr][col-1].en_passant:
                             # create initial and final move squares
                             initial = Square(row, col)
-                            final = Square(fr, col-1, p)
+                            final = Square(fr, col-1, p, True)
                             # create a new move
                             move = Move(initial, final)
                             
@@ -298,10 +344,10 @@ class Board:
                 if self.squares[row][col+1].has_enemy_piece(piece.color):
                     p = self.squares[row][col+1].piece
                     if isinstance(p, Pawn):
-                        if p.en_passant:
+                        if self.squares[fr][col+1].en_passant:
                             # create initial and final move squares
                             initial = Square(row, col)
-                            final = Square(fr, col+1, p)
+                            final = Square(fr, col+1, p, True)
                             # create a new move
                             move = Move(initial, final)
                             
@@ -432,7 +478,7 @@ class Board:
                                 piece.add_move(move) # append new move
 
             # castling moves
-            if not testing and not piece.moved:
+            if not testing and not piece.moved and not self.check_locs:
                 # left side castling
                 left_rook = self.squares[row][0].piece
                 if isinstance(left_rook, Rook):

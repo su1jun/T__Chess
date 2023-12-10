@@ -129,6 +129,10 @@
    'PYMODULE'),
   ('bz2', 'C:\\Users\\qaxsd\\anaconda3\\Lib\\bz2.py', 'PYMODULE'),
   ('calendar', 'C:\\Users\\qaxsd\\anaconda3\\Lib\\calendar.py', 'PYMODULE'),
+  ('chessbot',
+   'C:\\Users\\qaxsd\\OneDrive - SEOULTECH\\Project\\Toy '
+   'Game\\Chess\\src\\chessbot.py',
+   'PYMODULE'),
   ('cmd', 'C:\\Users\\qaxsd\\anaconda3\\Lib\\cmd.py', 'PYMODULE'),
   ('code', 'C:\\Users\\qaxsd\\anaconda3\\Lib\\code.py', 'PYMODULE'),
   ('codeop', 'C:\\Users\\qaxsd\\anaconda3\\Lib\\codeop.py', 'PYMODULE'),

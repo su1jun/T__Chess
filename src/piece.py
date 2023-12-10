@@ -1,11 +1,9 @@
 import os
 
 class Piece:
-    def __init__(self, name, color, value, texture=None, texture_rect=None):
+    def __init__(self, name, color, texture=None, texture_rect=None):
         self.name = name
         self.color = color
-        value_sign = 1 if color == 'white' else -1 # white == 1, black == -1
-        self.value = value * value_sign
         self.moves = []
         self.moved = False
         self.texture = texture
@@ -37,37 +35,32 @@ class Dummy_Piece:
 class Pawn(Piece):
     def __init__(self, color):
         self.dir = -1 if color == 'white' else 1
-        self.en_passant = False
-        super().__init__('pawn', color, 1.0)
+        super().__init__('pawn', color)
 
     def __str__(self):
         s = super().__str__()
-        if self.en_passant:
-            s += "/T"
-        else:
-            s += "/F"
         return s
 
 class Knight(Piece):
     def __init__(self, color):
-        super().__init__('knight', color, 3.0)
+        super().__init__('knight', color)
 
 class Bishop(Piece):
     def __init__(self, color):
-        super().__init__('bishop', color, 3.1)
+        super().__init__('bishop', color)
 
 class Rook(Piece):
     def __init__(self, color):
-        super().__init__('rook', color, 5.0)
+        super().__init__('rook', color)
 
 class Queen(Piece):
     def __init__(self, color):
-        super().__init__('queen', color, 9.0)
+        super().__init__('queen', color)
 
 class King(Piece):
     def __init__(self, color):
         self.castling = False
-        super().__init__('king', color, 10000.0)
+        super().__init__('king', color)
     
     def __str__(self):
         s = super().__str__()

@@ -20,6 +20,10 @@ def get_alphacol(col):
     ALPHACOLS = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h'}
     return ALPHACOLS[col]
 
+def get_number(val):
+    NUMBERS = {'a': 0,'b': 1 ,'c': 2 ,'d': 3 ,'e': 4 ,'f': 5 ,'g': 6 ,'h': 7}
+    return NUMBERS[val]
+
 ATTACK_DARK = "#C84646"
 ATTACK_LIGHT = "#C86464"
 
@@ -59,6 +63,9 @@ class Config:
         self.theme = self.themes[self.idx]
         self.voice_sex = self.voices[self.idx2]
 
+        self.lvfont = pygame.font.Font(
+            os.path.join('assets', 'fonts', 'Blinker-Bold.ttf')
+            , 48)
         self.font = pygame.font.Font(
             os.path.join('assets', 'fonts', 'Impact.ttf')
             , 18)
@@ -67,6 +74,35 @@ class Config:
             , 24)
         
         # images
+        self.game_title = os.path.join(
+            'assets', 'images', 'chess_title.png')
+        self.people1_btn = os.path.join(
+            'assets', 'images', 'people1_btn.png')
+        self.people2_btn = os.path.join(
+            'assets', 'images', 'people2_btn.png')
+        self.people1_btn_gray = os.path.join(
+            'assets', 'images', 'people1_btn_gray.png')
+        self.people2_btn_gray = os.path.join(
+            'assets', 'images', 'people2_btn_gray.png')
+        
+        self.right_btn = os.path.join(
+            'assets', 'images', 'right_arrow.png')
+        self.left_btn = os.path.join(
+            'assets', 'images', 'left_arrow.png')
+        self.right_btn_gray = os.path.join(
+            'assets', 'images', 'right_arrow_gray.png')
+        self.left_btn_gray = os.path.join(
+            'assets', 'images', 'left_arrow_gray.png')
+        
+        self.white_com = os.path.join(
+            'assets', 'images', 'white_computer.png')
+        self.black_com = os.path.join(
+            'assets', 'images', 'black_computer.png')
+        self.white_com_selected = os.path.join(
+            'assets', 'images', 'white_computer_selected.png')
+        self.black_com_selected = os.path.join(
+            'assets', 'images', 'black_computer_selected.png')
+
         self.white_icon = os.path.join(
             'assets', 'images', 'white_icon.png')
         self.black_icon = os.path.join(
@@ -81,6 +117,11 @@ class Config:
             'assets', 'images', 'game_end.png')
         
         # sounds
+        self.click_sound = Sound(
+            os.path.join('assets', 'sounds', 'effects', 'click.wav'))
+        self.start_sound = Sound(
+            os.path.join('assets', 'sounds', 'effects', 'board_start.mp3'))
+        
         self.move_sound = Sound(
             os.path.join('assets', 'sounds', 'effects', 'move_self.mp3'))
         self.capture_sound = Sound(
