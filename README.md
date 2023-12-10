@@ -8,6 +8,21 @@ Simply <b>grab</b> the piece you wish to move and <b>drag & drop</b> it to the d
 </p>
 <br>
 
+<h2>📒Demo Play</h2>
+https://github.com/su1jun/Chess/assets/120762843/5ffe04f7-0596-4d0a-a416-d0336becc4b8
+
+<h2>📒Multiple Implementations</h2>
+
+https://github.com/su1jun/Chess/assets/120762843/bc23c0ba-a476-4636-890b-3b55ae70284c
+
+https://github.com/su1jun/Chess/assets/120762843/89e505e4-6a91-4a25-b70b-dcbbaf77aebb
+
+https://github.com/su1jun/Chess/assets/120762843/2200d10b-7fae-4ded-bdfc-c95dbebed1c3
+
+https://github.com/su1jun/Chess/assets/120762843/d56b5bca-fda3-4ac5-80ec-b45797123566
+
+
+
 <h2>📃Manual</h2>
 <p>
 <b>Entry point</b>: Start the game via <b>src/main.py</b>, or use <b>chess.exe</b><br>
@@ -18,6 +33,16 @@ Simply <b>grab</b> the piece you wish to move and <b>drag & drop</b> it to the d
 
 <b>✍️ 'a' :</b> change <b>theme</b><br>
 <b>🔊 'b' :</b> change <b>voice</b>
+</p>
+https://github.com/su1jun/Chess/assets/120762843/a6933518-e697-46b2-ba61-0efc567c3acc
+
+<br>
+
+<h2>📚Licens</h2>
+<p>
+    The project includes the chess artificial intelligence <b>Stockfish</b> Open Source<br>
+    This project is <b>licensed</b> under the <b>GNU General Public License version 3</b>.<br>
+    See the stockfish/Copying.txt or README.md file for more information.
 </p>
 <br>
 
