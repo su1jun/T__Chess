@@ -298,6 +298,27 @@ class Main:
                                 captured = self.game.board.squares[released_row][released_col].has_piece()
                                 checked = self.game.board.on_check(self.game.dragger.piece, move)
 
+                                # castling to checked
+                                if isinstance(self.game.dragger.piece, King):
+                                    castling_bool = (abs(initial.col - final.col) == 2)
+                                    if castling_bool:
+                                        side = (final.col - initial.col) < 0 # True : left, False : right
+
+                                        if side:
+                                            rook = self.game.board.squares[final.row][0].piece
+                                            # rook move
+                                            initial = Square(final.row, 0)
+                                            final = Square(final.row, 3)
+                                            move_Rook = Move(initial, final)
+                                        else:
+                                            rook = self.game.board.squares[final.row][7].piece
+                                            # rook move
+                                            initial = Square(final.row, 7)
+                                            final = Square(final.row, 5)
+                                            move_Rook = Move(initial, final)
+
+                                        checked = (checked or self.game.board.on_check(rook, move_Rook))
+
                                 if captured:
                                     piece = self.game.board.squares[released_row][released_col].piece
                                     self.game.death_pieces[piece.color][piece.name] += 1
@@ -518,6 +539,27 @@ class Main:
                 if captured:
                     piece = self.game.board.squares[released_row][released_col].piece
                     self.game.death_pieces[piece.color][piece.name] += 1
+
+                # castling to checked
+                if isinstance(self.game.dragger.piece, King):
+                    castling_bool = (abs(initial.col - final.col) == 2)
+                    if castling_bool:
+                        side = (final.col - initial.col) < 0 # True : left, False : right
+
+                        if side:
+                            rook = self.game.board.squares[final.row][0].piece
+                            # rook move
+                            initial = Square(final.row, 0)
+                            final = Square(final.row, 3)
+                            move_Rook = Move(initial, final)
+                        else:
+                            rook = self.game.board.squares[final.row][7].piece
+                            # rook move
+                            initial = Square(final.row, 7)
+                            final = Square(final.row, 5)
+                            move_Rook = Move(initial, final)
+
+                        checked = (checked or self.game.board.on_check(rook, move_Rook))
 
                 # normal capture
                 self.game.board.move(self.game.dragger.piece, move)
