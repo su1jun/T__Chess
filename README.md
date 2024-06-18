@@ -32,6 +32,8 @@ https://github.com/su1jun/Chess/assets/120762843/d8c3a64e-9b5d-49cc-a9f5-73104c3
 
 #### Entry Point:
 Start the game via `src/main.py`, or use `chess.exe`.    
++ chess.exe is too large to be deleted temporarily
++ If necessary, you can use the source as an exe file with the pyinstaller library.
   
 
 ![Chess Entry Point](https://github.com/su1jun/Chess/assets/120762843/81e95128-f8fb-430f-b2f8-71eb9b780f39)  
